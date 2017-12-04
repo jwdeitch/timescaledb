@@ -1,4 +1,5 @@
 set(TEST_FILES
+  setup.sql
   agg_bookends.sql
   alternate_users.sql
   alter.sql

@@ -57,12 +57,15 @@ SELECT add_dimension('part_add_dim', 'location', 2, partitioning_func => 'bad_fu
 SELECT add_dimension('part_add_dim', 'location', 2, partitioning_func => '_timescaledb_internal.get_partition_for_key');
 SELECT * FROM _timescaledb_catalog.dimension;
 
+\if :is_pg10
 -- Should expect an error when creating a hypertable from a partition
 \set ON_ERROR_STOP 0
 CREATE TABLE partitioned_ht_create(time timestamptz, temp float, device int) PARTITION BY RANGE (time);
 SELECT create_hypertable('partitioned_ht_create', 'time');
 \set ON_ERROR_STOP 1
+\endif
 
+\if :is_pg10
 -- Should expect an error when attaching a hypertable to a partition
 \set ON_ERROR_STOP 0
 CREATE TABLE partitioned_attachment_vanilla(time timestamptz, temp float, device int) PARTITION BY RANGE (time);
@@ -70,8 +73,11 @@ CREATE TABLE attachment_hypertable(time timestamptz, temp float, device int);
 SELECT create_hypertable('attachment_hypertable', 'time');
 ALTER TABLE partitioned_attachment_vanilla ATTACH PARTITION attachment_hypertable FOR VALUES FROM ('2016-07-01') TO ('2016-08-01');
 \set ON_ERROR_STOP 1
+\endif 
 
+\if :is_pg10
 -- Should not expect an error when attaching a normal table to a partition
 CREATE TABLE partitioned_vanilla(time timestamptz, temp float, device int) PARTITION BY RANGE (time);
 CREATE TABLE attachment_vanilla(time timestamptz, temp float, device int);
 ALTER TABLE partitioned_vanilla ATTACH PARTITION attachment_vanilla FOR VALUES FROM ('2016-07-01') TO ('2016-08-01');
+\if :is_pg10
