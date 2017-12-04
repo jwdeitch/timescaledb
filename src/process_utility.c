@@ -1335,9 +1335,6 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 			break;
 		case AT_AddIndex:
 			{
-				if (NULL == ht)
-					break;
-
 				IndexStmt  *stmt = (IndexStmt *) cmd->def;
 				const char *idxname = stmt->idxname;
 
@@ -1348,15 +1345,14 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 				if (idxname == NULL)
 					idxname = get_rel_name(obj->objectId);
 
+				if (NULL == ht)
+					break;
 				process_altertable_add_constraint(ht, idxname);
 			}
 			break;
 		case AT_AddConstraint:
 		case AT_AddConstraintRecurse:
 			{
-				if (NULL == ht)
-					break;
-
 				Constraint *stmt = (Constraint *) cmd->def;
 				const char *conname = stmt->conname;
 
@@ -1369,6 +1365,8 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 				if (conname == NULL)
 					conname = get_rel_name(obj->objectId);
 
+				if (NULL == ht)
+					break;
 				process_altertable_add_constraint(ht, conname);
 			}
 			break;
