@@ -1369,6 +1369,22 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 			Assert(IsA(cmd->def, ColumnDef));
 			process_alter_column_type_end(ht, cmd);
 			break;
+#if PG10
+		case AT_AttachPartition:
+		{
+			RangeVar   *relation;
+			PartitionCmd  *stmt;
+			stmt = (PartitionCmd *) cmd->def;
+			relation = stmt->name;
+			Assert(NULL != relation);
+
+			if (InvalidOid != hypertable_relid(relation)) {
+				ereport(ERROR,
+						(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+								errmsg("Hypertables do not support native postgres partitioning")));
+			}
+		}
+#endif
 		default:
 			break;
 	}
@@ -1417,19 +1433,16 @@ process_altertable_end_table(Node *parsetree, CollectedCommand *cmd)
 
 	ht = hypertable_cache_get_entry(hcache, relid);
 
-	if (NULL != ht)
+	switch (cmd->type)
 	{
-		switch (cmd->type)
-		{
-			case SCT_Simple:
-				process_altertable_end_simple_cmd(ht, cmd);
-				break;
-			case SCT_AlterTable:
-				process_altertable_end_subcmds(ht, cmd->d.alterTable.subcmds);
-				break;
-			default:
-				break;
-		}
+		case SCT_Simple:
+			process_altertable_end_simple_cmd(ht, cmd);
+			break;
+		case SCT_AlterTable:
+			process_altertable_end_subcmds(ht, cmd->d.alterTable.subcmds);
+			break;
+		default:
+			break;
 	}
 
 	cache_release(hcache);
