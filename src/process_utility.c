@@ -1324,7 +1324,8 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 	switch (cmd->subtype)
 	{
 		case AT_ChangeOwner:
-			process_altertable_change_owner(ht, cmd);
+			if (NULL != ht)
+				process_altertable_change_owner(ht, cmd);
 			break;
 		case AT_AddIndexConstraint:
 			ereport(ERROR,
@@ -1334,6 +1335,9 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 			break;
 		case AT_AddIndex:
 			{
+				if (NULL == ht)
+					break;
+
 				IndexStmt  *stmt = (IndexStmt *) cmd->def;
 				const char *idxname = stmt->idxname;
 
@@ -1350,6 +1354,9 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 		case AT_AddConstraint:
 		case AT_AddConstraintRecurse:
 			{
+				if (NULL == ht)
+					break;
+
 				Constraint *stmt = (Constraint *) cmd->def;
 				const char *conname = stmt->conname;
 
@@ -1366,6 +1373,9 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 			}
 			break;
 		case AT_AlterColumnType:
+			if (NULL == ht)
+				break;
+
 			Assert(IsA(cmd->def, ColumnDef));
 			process_alter_column_type_end(ht, cmd);
 			break;
