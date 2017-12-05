@@ -29,6 +29,7 @@ set(TEST_FILES
   insert_single.sql
   insert.sql
   partitioning.sql
+  partitioning-10.0.sql
   pg_dump.sql
   plain.sql
   reindex.sql
