@@ -1327,12 +1327,17 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 			if (NULL != ht)
 				process_altertable_change_owner(ht, cmd);
 			break;
-		case AT_AddIndexConstraint:
-			ereport(ERROR,
-					(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-					 errmsg("Hypertables currently do not support adding "
-							"a constraint using an existing index.")));
-			break;
+		case AT_AddIndexConstraint: 
+			{
+				if (NULL == ht)
+					break;
+				
+				ereport(ERROR,
+						(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+								errmsg("Hypertables currently do not support adding "
+											   "a constraint using an existing index.")));
+				break;
+			}
 		case AT_AddIndex:
 			{
 				IndexStmt  *stmt = (IndexStmt *) cmd->def;
@@ -1381,19 +1386,19 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 			break;
 #if PG10
 		case AT_AttachPartition:
-		{
-			RangeVar   *relation;
-			PartitionCmd  *stmt;
-			stmt = (PartitionCmd *) cmd->def;
-			relation = stmt->name;
-			Assert(NULL != relation);
-
-			if (InvalidOid != hypertable_relid(relation)) {
-				ereport(ERROR,
-						(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-								errmsg("Hypertables do not support native postgres partitioning")));
+			{
+				RangeVar   *relation;
+				PartitionCmd  *stmt;
+				stmt = (PartitionCmd *) cmd->def;
+				relation = stmt->name;
+				Assert(NULL != relation);
+	
+				if (InvalidOid != hypertable_relid(relation)) {
+					ereport(ERROR,
+							(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+									errmsg("Hypertables do not support native postgres partitioning")));
+				}
 			}
-		}
 #endif
 		default:
 			break;
