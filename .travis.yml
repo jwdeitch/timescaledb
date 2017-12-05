@@ -45,8 +45,7 @@ jobs:
           project:
             name: "timescale/timescaledb"
             description: "TimescaledDB an open-source time-series DB"
-          notifications:
-            email: false
+          notification_email: ci@timescale.com
           build_command_prepend: "./bootstrap Debug && cd build"
           build_command: "make"
           branch_pattern: coverity_scan

@@ -1352,7 +1352,7 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 
 				if (idxname == NULL)
 					idxname = get_rel_name(obj->objectId);
-				
+
 				process_altertable_add_constraint(ht, idxname);
 			}
 			break;
@@ -1373,7 +1373,7 @@ process_altertable_end_subcmd(Hypertable *ht, Node *parsetree, ObjectAddress *ob
 
 				if (conname == NULL)
 					conname = get_rel_name(obj->objectId);
-				
+
 				process_altertable_add_constraint(ht, conname);
 			}
 			break;
