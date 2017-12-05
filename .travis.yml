@@ -14,7 +14,7 @@ before_install:
   - git clone --branch ${PG_GIT_TAG} --depth 1 https://github.com/postgres/postgres.git /tmp/postgres
   - docker run -d --name pgbuild -v ${TRAVIS_BUILD_DIR}:/build -v /tmp/postgres:/postgres postgres:${PG_VERSION}-alpine
 install:
-  - docker exec -it pgbuild /bin/sh -c postgresql-client-10
+  - docker exec -it pgbuild /bin/sh -c "apt install postgresql-client-10"
   - docker exec -it pgbuild /bin/sh -c "apk add --no-cache --virtual .build-deps coreutils dpkg-dev gcc libc-dev make util-linux-dev diffutils cmake bison flex && mkdir -p /build/debug"
   # We only need to build the regress stuff
   - docker exec -it pgbuild /bin/sh -c "cd /postgres && ./configure --enable-debug --enable-cassert --without-readline --without-zlib && make -C /postgres/src/test/regress"
